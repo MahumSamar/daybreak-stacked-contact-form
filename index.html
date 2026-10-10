@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daybreak — Contact</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* 1u = 1px on the 1756×1080 reference frame; everything scales from it */
+    --u: min(100vh / 1080, 100vw / 1100, 1.15px);
+    --ink: #3b3b3b;
+    --ink-soft: #6b6b6b;
+    --muted: #8c8c8c;
+    --line: #e6e6e6;
+    --surface: #f9f9f9;
+    --red: #e5484d;
+    --ease-out: cubic-bezier(.22, 1, .36, 1);
+  }
+  @supports (height: 100svh) {
+    :root { --u: min(100svh / 1080, 100vw / 1100, 1.15px); }
+  }
+
+  html, body { height: 100%; }
+  body {
+    font-family: "Instrument Sans", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: var(--ink);
+    background: #efe6ee;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+  button, input, textarea { font: inherit; color: inherit; }
+  button { background: none; border: 0; cursor: pointer; }
+
+  /* ───────── Section ───────── */
+  .contact {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    overflow: hidden;
+    isolation: isolate;
+    background: linear-gradient(180deg, #edebf5 0%, #e7def0 26%, #f0dce5 50%, #f3e3db 76%, #f2e8d8 100%);
+  }
+  .contact__bg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    z-index: -2;
+    /* slight overscan hides any edge wobble from the generated clip */
+    transform: scale(1.04);
+  }
+  /* film grain, like the shader in the reference */
+  .contact__grain {
+    position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    opacity: .16; mix-blend-mode: soft-light;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .5  0 0 0 0 .5  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* ───────── Nav pill ───────── */
+  .nav {
+    position: absolute;
+    top: calc(20 * var(--u)); left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    display: flex; align-items: center;
+    gap: calc(4 * var(--u));
+    height: calc(58 * var(--u));
+    padding: 0 calc(5 * var(--u)) 0 calc(24 * var(--u));
+    border-radius: 999px;
+    background: rgba(250, 250, 250, .82);
+    -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+    box-shadow: 0 0 0 calc(1 * var(--u)) rgba(255,255,255,.6), 0 calc(6 * var(--u)) calc(24 * var(--u)) rgba(120, 100, 140, .10);
+    font-size: calc(15 * var(--u));
+    letter-spacing: -.01em;
+    white-space: nowrap;
+  }
+  .nav__brand {
+    display: flex; align-items: center; gap: calc(6 * var(--u));
+    color: #444; text-decoration: none; font-weight: 500;
+    margin-right: calc(16 * var(--u));
+  }
+  .nav__brand svg { width: calc(24 * var(--u)); height: calc(16 * var(--u)); }
+  .nav__link {
+    display: flex; align-items: center;
+    height: calc(46 * var(--u));
+    padding: 0 calc(16.5 * var(--u));
+    border-radius: 999px;
+    color: #555; text-decoration: none;
+    transition: color .25s ease, background .25s ease;
+  }
+  .nav__link:hover { color: #1f1f1f; }
+  .nav__link.is-active {
+    background: #fff; color: #3a3a3a;
+    padding: 0 calc(13 * var(--u));
+    box-shadow: 0 calc(2 * var(--u)) calc(8 * var(--u)) rgba(0,0,0,.10), 0 0 0 calc(1 * var(--u)) rgba(0,0,0,.03);
+  }
+
+  /* ───────── Card stack ───────── */
+  .stack { position: absolute; inset: 0; z-index: 5; }
+
+  .card {
+    --oy: 0px;                       /* per-card nudge so tall cards clear the nav */
+    position: absolute;
+    top: 50%; left: 50%;
+    width: calc(610 * var(--u));
+    padding: calc(46 * var(--u));
+    border: calc(4 * var(--u)) solid rgba(255, 255, 255, .55);
+    border-radius: calc(38 * var(--u));
+    background: var(--surface);
+    background-clip: padding-box;
+    box-shadow: 0 0 calc(22 * var(--u)) rgba(255, 255, 255, .55), 0 calc(10 * var(--u)) calc(40 * var(--u)) rgba(150, 120, 150, .07);
+    transform-origin: 50% 50%;
+    will-change: transform, opacity, filter;
+    transition:
+      transform .95s var(--ease-out),
+      opacity .55s ease,
+      filter .6s ease;
+  }
+
+  /* waiting below the fold, slightly tilted */
+  .card[data-pos="next"] {
+    transform: translate(-50%, calc(-50% + var(--oy) + 460 * var(--u))) rotate(2deg);
+    opacity: 0; filter: blur(0);
+    pointer-events: none; z-index: 4;
+    transition: transform .6s cubic-bezier(.5, 0, .75, .4), opacity .35s ease, filter .4s ease;
+  }
+  .card[data-pos="active"] {
+    transform: translate(-50%, calc(-50% + var(--oy))) rotate(0deg);
+    opacity: 1; filter: blur(0);
+    z-index: 3;
+    transition: transform .95s var(--ease-out), opacity .22s ease, filter .45s ease;
+  }
+  /* pushed back: the blurred peek behind the active card */
+  .card[data-pos="prev"] {
+    transform: translate(-50%, calc(-50% - 125 * var(--u))) rotate(-1deg) scale(.8);
+    opacity: .5; filter: blur(calc(5 * var(--u)));
+    pointer-events: none; z-index: 2;
+  }
+  .card[data-pos="gone"] {
+    transform: translate(-50%, calc(-50% - 190 * var(--u))) rotate(-1deg) scale(.66);
+    opacity: 0; filter: blur(calc(9 * var(--u)));
+    pointer-events: none; z-index: 1;
+  }
+
+  /* first paint: card resolves out of blur */
+  .card.is-intro { animation: intro .75s cubic-bezier(.2, .7, .2, 1) both; }
+  @keyframes intro {
+    0%   { opacity: 0; filter: blur(calc(16 * var(--u))); transform: translate(-50%, calc(-50% + var(--oy) + 12 * var(--u))) scale(.975); }
+    100% { opacity: 1; filter: blur(0);                   transform: translate(-50%, calc(-50% + var(--oy))) scale(1); }
+  }
+
+  /* header */
+  .card__head {
+    display: flex; align-items: center; justify-content: space-between;
+    height: calc(44 * var(--u));
+    padding: 0 calc(8 * var(--u));
+  }
+  .card__count { font-size: calc(18.5 * var(--u)); color: var(--muted); letter-spacing: -.02em; }
+  .arrow {
+    display: grid; place-items: center;
+    width: calc(34 * var(--u)); height: calc(34 * var(--u));
+    border-radius: 50%;
+    color: #555;
+    transition: color .2s ease, background .2s ease, transform .2s ease;
+  }
+  .arrow svg { width: calc(9 * var(--u)); height: calc(15 * var(--u)); }
+  .arrow:hover:not(:disabled) { background: rgba(0,0,0,.05); color: #111; }
+  .arrow:active:not(:disabled) { transform: scale(.9); }
+  .arrow:disabled { color: #cfcfcf; cursor: default; }
+
+  .card__title {
+    margin-top: calc(31 * var(--u));
+    font-size: calc(28.5 * var(--u));
+    font-weight: 500;
+    line-height: calc(40 * var(--u));
+    letter-spacing: -.035em;
+    color: var(--ink);
+  }
+
+  /* shared controls */
+  .btn {
+    display: block; width: 100%;
+    height: calc(61 * var(--u));
+    border-radius: calc(14 * var(--u));
+    background: #222; color: #fff;
+    font-size: calc(16.5 * var(--u)); font-weight: 500; letter-spacing: -.01em;
+    box-shadow: 0 calc(5 * var(--u)) calc(10 * var(--u)) rgba(0,0,0,.20);
+    transition: background .35s ease, box-shadow .35s ease, transform .2s ease;
+  }
+  .btn:hover:not(:disabled) { background: #000; }
+  .btn:active:not(:disabled) { transform: scale(.985); }
+  .btn:disabled {
+    background: #bcbcbc; cursor: default;
+    box-shadow: 0 calc(3 * var(--u)) calc(6 * var(--u)) rgba(0,0,0,.08);
+  }
+
+  .label {
+    display: block;
+    font-size: calc(16.5 * var(--u)); font-weight: 500; letter-spacing: -.02em;
+    color: #333;
+    line-height: calc(22 * var(--u));
+    margin-bottom: calc(8 * var(--u));
+  }
+  .label i { font-style: normal; color: var(--red); margin-left: calc(3 * var(--u)); }
+
+  .input, .textarea {
+    display: block; width: 100%;
+    border: calc(1.5 * var(--u)) solid #e2e2e2;
+    border-radius: calc(13 * var(--u));
+    background: #fafafa;
+    box-shadow: inset 0 calc(1 * var(--u)) calc(3 * var(--u)) rgba(0,0,0,.05);
+    font-size: calc(16.5 * var(--u)); letter-spacing: -.01em;
+    color: #333;
+    outline: none;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .input { height: calc(47 * var(--u)); padding: 0 calc(15 * var(--u)); }
+  .textarea { height: calc(152 * var(--u)); padding: calc(20 * var(--u)); resize: none; line-height: 1.45; border-radius: calc(15 * var(--u)); }
+  .input::placeholder, .textarea::placeholder { color: #a6a6a6; }
+  .input:focus, .textarea:focus { border-color: #bdbdbd; background: #fff; box-shadow: 0 0 0 calc(4 * var(--u)) rgba(0,0,0,.04); }
+
+  /* step 1 */
+  .lede {
+    margin-top: calc(9 * var(--u));
+    font-size: calc(20.5 * var(--u)); line-height: calc(33.5 * var(--u));
+    letter-spacing: -.012em;
+    color: var(--ink-soft);
+    max-width: calc(480 * var(--u));
+  }
+  .email {
+    display: flex; align-items: center; justify-content: space-between; gap: calc(12 * var(--u));
+    margin-top: calc(28 * var(--u));
+    height: calc(68 * var(--u));
+    padding: 0 calc(12 * var(--u)) 0 calc(19 * var(--u));
+    border: calc(1.5 * var(--u)) solid #e8e8e8;
+    border-radius: calc(16 * var(--u));
+    font-size: calc(17.5 * var(--u)); letter-spacing: -.02em;
+    color: #555;
+  }
+  .email__addr { display: flex; align-items: center; gap: calc(3 * var(--u)); color: #555; min-width: 0; }
+  .email__addr span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .copy {
+    position: relative;
+    display: grid; place-items: center; flex: none;
+    width: calc(32 * var(--u)); height: calc(32 * var(--u));
+    border-radius: calc(8 * var(--u));
+    color: #555;
+    transition: background .2s ease, color .2s ease;
+  }
+  .copy:hover { background: rgba(0,0,0,.06); color: #111; }
+  .copy svg { width: calc(16 * var(--u)); height: calc(17 * var(--u)); transition: transform .25s var(--ease-out), opacity .2s ease; }
+  .copy .ic-check { position: absolute; transform: scale(.4); opacity: 0; }
+  .copy.is-copied .ic-copy { transform: scale(.4); opacity: 0; }
+  .copy.is-copied .ic-check { transform: scale(1); opacity: 1; }
+  .card[data-step="1"] .btn { margin-top: calc(29 * var(--u)); }
+
+  /* step 2 / 4 */
+  .field { margin-top: calc(38 * var(--u)); }
+  .field--first { margin-top: calc(34 * var(--u)); }
+  .card[data-step="2"] .btn, .card[data-step="4"] .btn { margin-top: calc(29 * var(--u)); }
+
+  /* step 3 */
+  .grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: calc(20 * var(--u));
+    margin-top: calc(37 * var(--u));
+  }
+  .opt {
+    position: relative; display: block; cursor: pointer;
+    padding: calc(18.5 * var(--u));
+    border: calc(1.5 * var(--u)) solid var(--line);
+    border-radius: calc(22 * var(--u));
+    background: #fafafa;
+    transition: border-color .25s ease, background .25s ease, transform .3s var(--ease-out), box-shadow .3s ease;
+  }
+  .opt:hover { border-color: #d4d4d4; }
+  .opt:active { transform: scale(.985); }
+  .opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .opt__img {
+    display: block; width: 100%;
+    aspect-ratio: 206 / 152;
+    border-radius: calc(14 * var(--u));
+    object-fit: cover;
+    background: #ececec;
+    transition: transform .6s var(--ease-out);
+  }
+  .opt__thumb { overflow: hidden; border-radius: calc(14 * var(--u)); }
+  .opt:hover .opt__img { transform: scale(1.04); }
+  .opt__row {
+    display: flex; align-items: center; justify-content: space-between; gap: calc(8 * var(--u));
+    margin-top: calc(15 * var(--u));
+    height: calc(24 * var(--u));
+    font-size: calc(17 * var(--u)); letter-spacing: -.025em; color: var(--ink);
+    white-space: nowrap;
+  }
+  .opt__box {
+    display: grid; place-items: center; flex: none;
+    width: calc(19 * var(--u)); height: calc(19 * var(--u));
+    border: calc(1.5 * var(--u)) solid #d2d2d2;
+    border-radius: calc(6 * var(--u));
+    background: #fcfcfc;
+    transition: background .2s ease, border-color .2s ease;
+  }
+  .opt__box svg { width: 70%; height: 70%; stroke-dasharray: 16; stroke-dashoffset: 16; transition: stroke-dashoffset .3s ease .05s; }
+  .opt:has(input:checked) { border-color: #2a2a2a; background: #fff; box-shadow: 0 calc(6 * var(--u)) calc(18 * var(--u)) rgba(0,0,0,.06); }
+  .opt:has(input:checked) .opt__box { background: #222; border-color: #222; }
+  .opt:has(input:checked) .opt__box svg { stroke-dashoffset: 0; }
+  .opt:has(input:focus-visible) { outline: calc(2 * var(--u)) solid #9a9a9a; outline-offset: calc(2 * var(--u)); }
+  .card[data-step="3"] .btn { margin-top: calc(20 * var(--u)); }
+
+  /* step 5 */
+  .review { margin-top: calc(40 * var(--u)); }
+  .review__group + .review__group { margin-top: calc(31 * var(--u)); }
+  .review__k {
+    font-size: calc(17 * var(--u)); font-weight: 500; letter-spacing: -.02em; color: #333;
+    line-height: calc(24 * var(--u));
+  }
+  .review__k i { font-style: normal; color: var(--red); margin-left: calc(6 * var(--u)); }
+  .review__group.is-ok .review__k i { color: #3aa76d; }
+  .review__v {
+    margin-top: calc(7 * var(--u));
+    font-size: calc(17 * var(--u)); line-height: calc(29 * var(--u)); letter-spacing: -.02em;
+    color: #9a9a9a;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .review__v + .review__v { margin-top: 0; }
+  .review__v.is-set { color: #555; }
+  .card[data-step="5"] .btn { margin-top: calc(21 * var(--u)); }
+
+  /* ───────── Tablet / mobile ───────── */
+  @media (max-width: 700px) {
+    :root { --u: min(100vh / 900, 100vw / 430, 1px); }
+    @supports (height: 100svh) {
+      :root { --u: min(100svh / 900, 100vw / 430, 1px); }
+    }
+    .nav { top: calc(16 * var(--u)); height: calc(52 * var(--u)); padding-left: calc(18 * var(--u)); gap: 0; max-width: calc(100vw - 16px); }
+    .nav__brand { margin-right: calc(8 * var(--u)); }
+    .nav__link { height: calc(42 * var(--u)); padding: 0 calc(10 * var(--u)); }
+    .nav__link.is-active { padding: 0 calc(12 * var(--u)); }
+    .card {
+      width: min(calc(610 * var(--u)), calc(100vw - 24px));
+      padding: calc(26 * var(--u));
+      border-radius: calc(30 * var(--u));
+    }
+    .card__head { padding: 0; }
+    .card__title { margin-top: calc(22 * var(--u)); font-size: calc(25 * var(--u)); line-height: calc(33 * var(--u)); }
+    .lede { font-size: calc(18 * var(--u)); line-height: calc(28 * var(--u)); }
+    .email { height: calc(60 * var(--u)); font-size: calc(15.5 * var(--u)); padding-left: calc(14 * var(--u)); padding-right: calc(6 * var(--u)); }
+    .btn { height: calc(56 * var(--u)); }
+    .grid { gap: calc(12 * var(--u)); margin-top: calc(24 * var(--u)); }
+    .opt { padding: calc(11 * var(--u)); border-radius: calc(18 * var(--u)); }
+    .opt__row { font-size: calc(14 * var(--u)); margin-top: calc(10 * var(--u)); }
+    .field { margin-top: calc(26 * var(--u)); }
+    .field--first { margin-top: calc(24 * var(--u)); }
+    .textarea { height: calc(130 * var(--u)); padding: calc(15 * var(--u)); }
+    .review { margin-top: calc(28 * var(--u)); }
+    .review__group + .review__group { margin-top: calc(22 * var(--u)); }
+    .card[data-pos="prev"] { transform: translate(-50%, calc(-50% - 105 * var(--u))) rotate(-1deg) scale(.82); }
+  }
+  @media (max-width: 380px) {
+    .nav__brand span { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .card, .card[data-pos="next"] { transition-duration: .01s; }
+    .card.is-intro { animation-duration: .01s; }
+  }
+</style>
+</head>
+<body>
+
+<section class="contact" id="contact" aria-label="Contact Daybreak">
+  <!-- Background: Higgsfield-generated shader gradient, animated -->
+  <video class="contact__bg" autoplay muted loop playsinline preload="auto"
+         poster="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261010_122843_6219c053-49e4-41d3-87da-2eabd28d5bf3.png">
+    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261010_123003_e6753b57-08ba-418c-a20d-2c8052e1da0a.mp4" type="video/mp4">
+  </video>
+  <div class="contact__grain" aria-hidden="true"></div>
+
+  <nav class="nav" aria-label="Primary">
+    <a class="nav__brand" href="#">
+      <svg viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M12 12.5V2.5M12 12.5 7.2 4M12 12.5l4.8-8.5M12 12.5 3.4 7.2M12 12.5l8.6-5.3M1.5 12.5c3.4-1.2 7-1.2 10.500 0 3.500-1.200 7.100-1.200 10.500 0"/>
+      </svg>
+      <span>Daybreak</span>
+    </a>
+    <a class="nav__link" href="#">Services</a>
+    <a class="nav__link" href="#">Work</a>
+    <a class="nav__link" href="#">About</a>
+    <a class="nav__link is-active" href="#contact" aria-current="page">Contact</a>
+  </nav>
+
+  <form class="stack" id="stack" novalidate>
+
+    <!-- 1 -->
+    <div class="card is-intro" data-step="1" data-pos="active">
+      <div class="card__head">
+        <button type="button" class="arrow" data-dir="-1" aria-label="Previous step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.500 1.500 1.500 7.500l6 6"/></svg></button>
+        <span class="card__count">1 of 5</span>
+        <button type="button" class="arrow" data-dir="1" aria-label="Next step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m1.500 1.500 6 6-6 6"/></svg></button>
+      </div>
+      <h2 class="card__title">Lets talk!</h2>
+      <p class="lede">We love playing with the possibilities of tech, and we're here to explore them with you.</p>
+      <div class="email">
+        <span>Email us:</span>
+        <span class="email__addr">
+          <span>hello@daybreak.studio</span>
+          <button type="button" class="copy" id="copy" aria-label="Copy email address">
+            <svg class="ic-copy" viewBox="0 0 16 17" fill="currentColor"><path d="M5.200 1.200h4.300l3.700 3.700v6.500a1.600 1.600 0 0 1-1.600 1.600H5.200a1.600 1.600 0 0 1-1.600-1.600V2.800a1.600 1.600 0 0 1 1.600-1.600Zm3.900 1.300v2.300a.6.600 0 0 0 .6.600h2.300L9.100 2.500ZM6 8.100a.55.550 0 0 0 0 1.100h4.200a.55.550 0 0 0 0-1.100H6Zm0 2.200a.55.550 0 0 0 0 1.100h2.700a.55.550 0 0 0 0-1.100H6Z"/><path d="M2.300 4.300v8.300a2.600 2.600 0 0 0 2.600 2.600h5.900a1.500 1.500 0 0 1-1.400 1H4.700a3.400 3.400 0 0 1-3.400-3.400V5.700a1.500 1.500 0 0 1 1-1.400Z"/></svg>
+            <svg class="ic-check" viewBox="0 0 16 17" fill="none" stroke="currentColor" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 3.500 3.500L13 5"/></svg>
+          </button>
+        </span>
+      </div>
+      <button type="button" class="btn" data-dir="1">Get Started</button>
+    </div>
+
+    <!-- 2 -->
+    <div class="card" data-step="2" data-pos="next">
+      <div class="card__head">
+        <button type="button" class="arrow" data-dir="-1" aria-label="Previous step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.500 1.500 1.500 7.500l6 6"/></svg></button>
+        <span class="card__count">2 of 5</span>
+        <button type="button" class="arrow" data-dir="1" aria-label="Next step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m1.500 1.500 6 6-6 6"/></svg></button>
+      </div>
+      <h2 class="card__title">We'll need a few details first...</h2>
+      <div class="field field--first">
+        <label class="label" for="f-name">Full Name<i>*</i></label>
+        <input class="input" id="f-name" name="name" type="text" placeholder="Your name" autocomplete="name">
+      </div>
+      <div class="field">
+        <label class="label" for="f-email">Email<i>*</i></label>
+        <input class="input" id="f-email" name="email" type="email" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <button type="button" class="btn" data-dir="1" data-gate disabled>Next</button>
+    </div>
+
+    <!-- 3 -->
+    <div class="card" data-step="3" data-pos="next">
+      <div class="card__head">
+        <button type="button" class="arrow" data-dir="-1" aria-label="Previous step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.500 1.500 1.500 7.500l6 6"/></svg></button>
+        <span class="card__count">3 of 5</span>
+        <button type="button" class="arrow" data-dir="1" aria-label="Next step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m1.500 1.500 6 6-6 6"/></svg></button>
+      </div>
+      <h2 class="card__title">What can we help you with?</h2>
+      <div class="grid">
+        <label class="opt">
+          <input type="checkbox" name="type" value="Brand &amp; Identity">
+          <div class="opt__thumb"><img class="opt__img" alt="Brand &amp; Identity" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261010_122843_2200ec52-775f-4474-8def-1f395be1925f.png"></div>
+          <div class="opt__row"><span>Brand &amp; Identity</span><span class="opt__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round"><path d="m2 6.300 2.600 2.600L10 3.300"/></svg></span></div>
+        </label>
+        <label class="opt">
+          <input type="checkbox" name="type" value="Web Experience">
+          <div class="opt__thumb"><img class="opt__img" alt="Web Experience" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261010_122843_dbd8c512-d157-48ec-abe1-79e1d0247c38.png"></div>
+          <div class="opt__row"><span>Web Experience</span><span class="opt__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round"><path d="m2 6.300 2.600 2.600L10 3.300"/></svg></span></div>
+        </label>
+        <label class="opt">
+          <input type="checkbox" name="type" value="Motion &amp; Animation">
+          <div class="opt__thumb"><img class="opt__img" alt="Motion &amp; Animation" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261010_122843_930b7b53-47e0-49ec-a4d5-03b6a6c61a3b.png"></div>
+          <div class="opt__row"><span>Motion &amp; Animation</span><span class="opt__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round"><path d="m2 6.300 2.600 2.600L10 3.300"/></svg></span></div>
+        </label>
+        <label class="opt">
+          <input type="checkbox" name="type" value="Product Design">
+          <div class="opt__thumb"><img class="opt__img" alt="Product Design" src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20261010_122842_33023696-c859-4ac7-88cd-b16fee2dd38a.png"></div>
+          <div class="opt__row"><span>Product Design</span><span class="opt__box"><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.800" stroke-linecap="round" stroke-linejoin="round"><path d="m2 6.300 2.600 2.600L10 3.300"/></svg></span></div>
+        </label>
+      </div>
+      <button type="button" class="btn" data-dir="1" data-gate disabled>Next</button>
+    </div>
+
+    <!-- 4 -->
+    <div class="card" data-step="4" data-pos="next">
+      <div class="card__head">
+        <button type="button" class="arrow" data-dir="-1" aria-label="Previous step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.500 1.500 1.500 7.500l6 6"/></svg></button>
+        <span class="card__count">4 of 5</span>
+        <button type="button" class="arrow" data-dir="1" aria-label="Next step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m1.500 1.500 6 6-6 6"/></svg></button>
+      </div>
+      <h2 class="card__title">Tell us more about your idea!</h2>
+      <div class="field field--first">
+        <label class="label" for="f-details">Project Details<i>*</i></label>
+        <textarea class="textarea" id="f-details" name="details" placeholder="Share your vision, goals, and any specific requirements..."></textarea>
+      </div>
+      <div class="field">
+        <label class="label" for="f-link">Reference Link (Optional)</label>
+        <input class="input" id="f-link" name="link" type="text" placeholder="daybreak.studio">
+      </div>
+      <button type="button" class="btn" data-dir="1" data-gate disabled>Next</button>
+    </div>
+
+    <!-- 5 -->
+    <div class="card" data-step="5" data-pos="next">
+      <div class="card__head">
+        <button type="button" class="arrow" data-dir="-1" aria-label="Previous step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7.500 1.500 1.500 7.500l6 6"/></svg></button>
+        <span class="card__count">5 of 5</span>
+        <button type="button" class="arrow" data-dir="1" aria-label="Next step"><svg viewBox="0 0 9 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m1.500 1.500 6 6-6 6"/></svg></button>
+      </div>
+      <h2 class="card__title" id="r-title">Review your submission</h2>
+      <div class="review">
+        <div class="review__group" id="r-contact">
+          <div class="review__k">Contact Details<i>•</i></div>
+          <div class="review__v" id="r-name">No name provided</div>
+          <div class="review__v" id="r-email">No email provided</div>
+        </div>
+        <div class="review__group" id="r-types-g">
+          <div class="review__k">Project Types<i>•</i></div>
+          <div class="review__v" id="r-types">No project types selected.</div>
+        </div>
+        <div class="review__group" id="r-details-g">
+          <div class="review__k">Project Details<i>•</i></div>
+          <div class="review__v" id="r-details">Tell us about your idea!</div>
+        </div>
+      </div>
+      <button type="submit" class="btn" id="submit" disabled>Submit</button>
+    </div>
+
+  </form>
+</section>
+
+<script>
+(() => {
+  const stack = document.getElementById('stack');
+  const cards = [...stack.querySelectorAll('.card')];
+  const total = cards.length;
+  let current = 0;
+
+  const $ = id => document.getElementById(id);
+  const fields = { name: $('f-name'), email: $('f-email'), details: $('f-details') };
+  const types = () => [...stack.querySelectorAll('input[name="type"]:checked')].map(i => i.value);
+  const emailOk = v => /^\S+@\S+\.\S+$/.test(v.trim());
+
+  const valid = {
+    2: () => fields.name.value.trim() !== '' && emailOk(fields.email.value),
+    3: () => types().length > 0,
+    4: () => fields.details.value.trim() !== ''
+  };
+
+  /* Tall cards sit lower so they never slide under the nav (as in the reference). */
+  function layout() {
+    const u = parseFloat(getComputedStyle(cards[0]).borderTopWidth) / 4 || 1;
+    const H = stack.clientHeight;
+    const minTop = (window.innerWidth <= 700 ? 96 : 158) * u;
+    cards.forEach(c => {
+      const top = (H - c.offsetHeight) / 2;
+      c.style.setProperty('--oy', Math.max(0, minTop - top) + 'px');
+    });
+  }
+
+  function render() {
+    cards.forEach((c, i) => {
+      const d = i - current;
+      c.dataset.pos = d === 0 ? 'active' : d === -1 ? 'prev' : d < -1 ? 'gone' : 'next';
+      c.inert = d !== 0;
+      c.querySelector('[data-dir="-1"]').disabled = i === 0;
+      c.querySelector('.arrow[data-dir="1"]').disabled = i === total - 1;
+    });
+  }
+
+  function go(to) {
+    if (to < 0 || to >= total || to === current) return;
+    cards[0].classList.remove('is-intro');
+    current = to;
+    if (current === total - 1) review();
+    render();
+  }
+
+  function gate() {
+    cards.forEach(c => {
+      const b = c.querySelector('[data-gate]');
+      if (b) b.disabled = !valid[c.dataset.step]();
+    });
+    $('submit').disabled = !(valid[2]() && valid[3]() && valid[4]());
+  }
+
+  function setVal(el, value, fallback) {
+    el.textContent = value || fallback;
+    el.classList.toggle('is-set', !!value);
+  }
+  function review() {
+    const n = fields.name.value.trim(), e = fields.email.value.trim(), t = types(), d = fields.details.value.trim();
+    setVal($('r-name'), n, 'No name provided');
+    setVal($('r-email'), e, 'No email provided');
+    setVal($('r-types'), t.join(', '), 'No project types selected.');
+    setVal($('r-details'), d, 'Tell us about your idea!');
+    $('r-contact').classList.toggle('is-ok', valid[2]());
+    $('r-types-g').classList.toggle('is-ok', valid[3]());
+    $('r-details-g').classList.toggle('is-ok', valid[4]());
+    requestAnimationFrame(layout);
+  }
+
+  stack.addEventListener('click', e => {
+    const b = e.target.closest('[data-dir]');
+    if (b && !b.disabled) go(current + Number(b.dataset.dir));
+  });
+  stack.addEventListener('input', gate);
+  stack.addEventListener('change', gate);
+  stack.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.matches('.input')) {
+      e.preventDefault();
+      const b = cards[current].querySelector('.btn');
+      if (b && !b.disabled) b.click();
+    }
+  });
+  stack.addEventListener('submit', e => {
+    e.preventDefault();
+    if ($('submit').disabled) return;
+    $('r-title').textContent = 'Thanks — we\'ll be in touch!';
+    $('submit').textContent = 'Sent';
+    $('submit').disabled = true;
+  });
+
+  $('copy').addEventListener('click', async e => {
+    const btn = e.currentTarget;
+    try { await navigator.clipboard.writeText('hello@daybreak.studio'); } catch (_) {}
+    btn.classList.add('is-copied');
+    setTimeout(() => btn.classList.remove('is-copied'), 1400);
+  });
+
+  window.addEventListener('resize', layout);
+  window.addEventListener('load', layout);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(layout);
+  stack.querySelectorAll('img').forEach(img => img.addEventListener('load', layout));
+
+  layout(); render(); gate();
+})();
+</script>
+</body>
+</html>
